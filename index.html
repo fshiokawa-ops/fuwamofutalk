@@ -197,7 +197,7 @@
 
 <div class="search-wrap" id="search-wrap">
   <input class="search-input" id="search-input" type="text" autocomplete="off"
-    placeholder="なまえで検索… (例: Shiba, Persian)"
+    placeholder="なまえで検索… (例: 柴犬, シャム, Golden)"
     oninput="onInput()" onkeydown="onKeyDown(event)" onfocus="showDrop()">
   <span class="search-icon">🔍</span>
   <div class="dropdown hidden" id="dropdown"></div>
@@ -219,37 +219,64 @@
 <script>
 // ── 犬ブリードデータ（内蔵） ──
 const DOG_BREEDS = [
-  { id:"shiba",        api:"shiba",             name:"Shiba Inu",         origin:"Japan",          life_span:"12 - 15 years", temperament:"Alert, Active, Attentive, Faithful, Docile",              group:"Non-Sporting",  weight:"8 - 11",   bred_for:"Mountain hunting" },
-  { id:"akita",        api:"akita",             name:"Akita",             origin:"Japan",          life_span:"10 - 13 years", temperament:"Courageous, Dignified, Loyal, Receptive, Friendly",       group:"Working",       weight:"32 - 45",  bred_for:"Bear hunting" },
-  { id:"husky",        api:"husky",             name:"Siberian Husky",    origin:"Russia",         life_span:"12 - 14 years", temperament:"Outgoing, Friendly, Alert, Gentle, Intelligent",          group:"Working",       weight:"16 - 27",  bred_for:"Sled pulling" },
-  { id:"samoyed",      api:"samoyed",           name:"Samoyed",           origin:"Russia",         life_span:"12 - 14 years", temperament:"Lively, Stubborn, Alert, Friendly, Sociable, Playful",    group:"Working",       weight:"16 - 30",  bred_for:"Herding reindeer" },
-  { id:"golden",       api:"retriever/golden",  name:"Golden Retriever",  origin:"Scotland",       life_span:"10 - 12 years", temperament:"Reliable, Trustworthy, Friendly, Kind, Confident",        group:"Sporting",      weight:"25 - 34",  bred_for:"Retrieving game birds" },
-  { id:"labrador",     api:"labrador",          name:"Labrador Retriever",origin:"Canada",         life_span:"10 - 12 years", temperament:"Gentle, Outgoing, Intelligent, Trusting, Agile",          group:"Sporting",      weight:"25 - 36",  bred_for:"Retrieving fish and game" },
-  { id:"poodle",       api:"poodle/standard",   name:"Poodle",            origin:"France",         life_span:"12 - 15 years", temperament:"Intelligent, Alert, Faithful, Trainable, Active",         group:"Non-Sporting",  weight:"20 - 32",  bred_for:"Water retrieving" },
-  { id:"bulldog",      api:"bulldog/english",   name:"English Bulldog",   origin:"England",        life_span:"8 - 10 years",  temperament:"Docile, Willful, Friendly, Gregarious",                  group:"Non-Sporting",  weight:"18 - 25",  bred_for:"Bull-baiting" },
-  { id:"frenchbull",   api:"bulldog/french",    name:"French Bulldog",    origin:"France",         life_span:"10 - 12 years", temperament:"Easygoing, Patient, Affectionate, Lively, Playful",      group:"Non-Sporting",  weight:"7 - 13",   bred_for:"Companion" },
-  { id:"beagle",       api:"beagle",            name:"Beagle",            origin:"England",        life_span:"12 - 15 years", temperament:"Determined, Gentle, Excitable, Intelligent, Amiable",     group:"Hound",         weight:"9 - 11",   bred_for:"Rabbit hunting" },
-  { id:"pomeranian",   api:"pomeranian",        name:"Pomeranian",        origin:"Germany",        life_span:"12 - 16 years", temperament:"Sociable, Extroverted, Lively, Friendly, Playful",        group:"Toy",           weight:"1.9 - 3.5",bred_for:"Companion" },
-  { id:"chihuahua",    api:"chihuahua",         name:"Chihuahua",         origin:"Mexico",         life_span:"12 - 20 years", temperament:"Devoted, Lively, Quick, Alert, Courageous",               group:"Toy",           weight:"1.5 - 3",  bred_for:"Companion" },
-  { id:"maltese",      api:"maltese",           name:"Maltese",           origin:"Malta",          life_span:"12 - 15 years", temperament:"Gentle, Playful, Fearless, Lively, Intelligent, Responsive",group:"Toy",         weight:"1.4 - 4",  bred_for:"Companion" },
-  { id:"corgi",        api:"corgi/cardigan",    name:"Corgi",             origin:"Wales",          life_span:"12 - 15 years", temperament:"Playful, Tenacious, Friendly, Bold, Outgoing, Intelligent",group:"Herding",      weight:"11 - 14",  bred_for:"Herding cattle" },
-  { id:"dachshund",    api:"dachshund",         name:"Dachshund",         origin:"Germany",        life_span:"12 - 16 years", temperament:"Stubborn, Devoted, Lively, Playful, Clever, Courageous",  group:"Hound",         weight:"3 - 5",    bred_for:"Hunting badgers" },
-  { id:"shepherd",     api:"german/shepherd",   name:"German Shepherd",   origin:"Germany",        life_span:"9 - 13 years",  temperament:"Stubborn, Loyal, Obedient, Alert, Courageous, Intelligent",group:"Herding",      weight:"22 - 40",  bred_for:"Herding sheep" },
-  { id:"shihtzu",      api:"shihtzu",           name:"Shih Tzu",          origin:"China",          life_span:"10 - 16 years", temperament:"Clever, Spunky, Outgoing, Friendly, Lively, Loyal, Gentle",group:"Toy",         weight:"4 - 7.2",  bred_for:"Companion" },
-  { id:"yorkshire",    api:"yorkshire",         name:"Yorkshire Terrier", origin:"England",        life_span:"13 - 16 years", temperament:"Bold, Independent, Confident, Courageous, Intelligent",    group:"Toy",           weight:"2 - 3.2",  bred_for:"Catching rats" },
-  { id:"dalmatian",    api:"dalmatian",         name:"Dalmatian",         origin:"Croatia",        life_span:"10 - 13 years", temperament:"Energetic, Active, Friendly, Outgoing, Intelligent, Playful",group:"Non-Sporting",weight:"20 - 32",  bred_for:"Carriage dog" },
-  { id:"boxer",        api:"boxer",             name:"Boxer",             origin:"Germany",        life_span:"10 - 12 years", temperament:"Devoted, Loyal, Friendly, Fearless, Cheerful, Energetic",  group:"Working",       weight:"25 - 32",  bred_for:"Hunting large game" },
-  { id:"collie",       api:"collie/border",     name:"Border Collie",     origin:"United Kingdom", life_span:"10 - 17 years", temperament:"Tenacious, Keen, Energetic, Responsive, Alert, Intelligent",group:"Herding",      weight:"14 - 20",  bred_for:"Herding sheep" },
-  { id:"pug",          api:"pug",               name:"Pug",               origin:"China",          life_span:"12 - 15 years", temperament:"Docile, Clever, Sociable, Attentive, Stubborn, Charming",  group:"Toy",           weight:"6 - 8",    bred_for:"Companion" },
-  { id:"doberman",     api:"doberman",          name:"Doberman",          origin:"Germany",        life_span:"10 - 13 years", temperament:"Energetic, Alert, Loyal, Intelligent, Fearless, Obedient",  group:"Working",       weight:"32 - 45",  bred_for:"Personal protection" },
-  { id:"rottweiler",   api:"rottweiler",        name:"Rottweiler",        origin:"Germany",        life_span:"8 - 10 years",  temperament:"Steady, Alert, Self-assured, Devoted, Obedient, Fearless",  group:"Working",       weight:"38 - 59",  bred_for:"Herding livestock" },
-  { id:"malamute",     api:"malamute",          name:"Alaskan Malamute",  origin:"USA",            life_span:"10 - 14 years", temperament:"Affectionate, Friendly, Devoted, Loyal, Dignified, Playful",group:"Working",      weight:"34 - 38",  bred_for:"Pulling heavy sleds" },
-  { id:"papillon",     api:"papillon",          name:"Papillon",          origin:"France",         life_span:"13 - 15 years", temperament:"Energetic, Friendly, Alert, Intelligent, Responsive, Happy",group:"Toy",          weight:"3 - 4.5",  bred_for:"Companion" },
-  { id:"vizsla",       api:"vizsla",            name:"Vizsla",            origin:"Hungary",        life_span:"12 - 15 years", temperament:"Gentle, Energetic, Loyal, Affectionate, Quiet, Agile",     group:"Sporting",      weight:"18 - 27",  bred_for:"Hunting" },
-  { id:"weimaraner",   api:"weimaraner",        name:"Weimaraner",        origin:"Germany",        life_span:"11 - 14 years", temperament:"Alert, Energetic, Intelligent, Stubborn, Steady, Powerful",  group:"Sporting",     weight:"25 - 40",  bred_for:"Hunting" },
-  { id:"havanese",     api:"havanese",          name:"Havanese",          origin:"Cuba",           life_span:"14 - 16 years", temperament:"Playful, Companionable, Affectionate, Responsive, Gentle",  group:"Toy",           weight:"3 - 6",    bred_for:"Companion" },
-  { id:"newfoundland", api:"newfoundland",      name:"Newfoundland",      origin:"Canada",         life_span:"8 - 10 years",  temperament:"Gentle, Trainable, Sweet-Tempered, Patient, Active",       group:"Working",       weight:"45 - 68",  bred_for:"Water rescue" },
+  { id:"shiba",        api:"shiba",             name:"Shiba Inu",          nameJa:"柴犬",                    origin:"日本",          life_span:"12〜15年", temperament:"Alert, Active, Attentive, Faithful, Docile",               group:"Non-Sporting",  weight:"8〜11",   bred_for:"山岳での狩猟" },
+  { id:"akita",        api:"akita",             name:"Akita",              nameJa:"秋田犬",                  origin:"日本",          life_span:"10〜13年", temperament:"Courageous, Dignified, Loyal, Receptive, Friendly",        group:"Working",       weight:"32〜45",  bred_for:"熊狩り" },
+  { id:"husky",        api:"husky",             name:"Siberian Husky",     nameJa:"シベリアン・ハスキー",    origin:"ロシア",        life_span:"12〜14年", temperament:"Outgoing, Friendly, Alert, Gentle, Intelligent",           group:"Working",       weight:"16〜27",  bred_for:"そり引き" },
+  { id:"samoyed",      api:"samoyed",           name:"Samoyed",            nameJa:"サモエド",                origin:"ロシア",        life_span:"12〜14年", temperament:"Lively, Stubborn, Alert, Friendly, Sociable, Playful",     group:"Working",       weight:"16〜30",  bred_for:"トナカイの放牧" },
+  { id:"golden",       api:"retriever/golden",  name:"Golden Retriever",   nameJa:"ゴールデン・レトリバー",  origin:"スコットランド",life_span:"10〜12年", temperament:"Reliable, Trustworthy, Friendly, Kind, Confident",         group:"Sporting",      weight:"25〜34",  bred_for:"猟鳥の回収" },
+  { id:"labrador",     api:"labrador",          name:"Labrador Retriever", nameJa:"ラブラドール・レトリバー",origin:"カナダ",        life_span:"10〜12年", temperament:"Gentle, Outgoing, Intelligent, Trusting, Agile",           group:"Sporting",      weight:"25〜36",  bred_for:"魚や猟鳥の回収" },
+  { id:"poodle",       api:"poodle/standard",   name:"Poodle",             nameJa:"プードル",                origin:"フランス",      life_span:"12〜15年", temperament:"Intelligent, Alert, Faithful, Trainable, Active",          group:"Non-Sporting",  weight:"20〜32",  bred_for:"水鳥の回収" },
+  { id:"bulldog",      api:"bulldog/english",   name:"English Bulldog",    nameJa:"イングリッシュ・ブルドッグ",origin:"イギリス",    life_span:"8〜10年",  temperament:"Docile, Willful, Friendly, Gregarious",                   group:"Non-Sporting",  weight:"18〜25",  bred_for:"闘牛" },
+  { id:"frenchbull",   api:"bulldog/french",    name:"French Bulldog",     nameJa:"フレンチ・ブルドッグ",    origin:"フランス",      life_span:"10〜12年", temperament:"Easygoing, Patient, Affectionate, Lively, Playful",       group:"Non-Sporting",  weight:"7〜13",   bred_for:"愛玩犬" },
+  { id:"beagle",       api:"beagle",            name:"Beagle",             nameJa:"ビーグル",                origin:"イギリス",      life_span:"12〜15年", temperament:"Determined, Gentle, Excitable, Intelligent, Amiable",      group:"Hound",         weight:"9〜11",   bred_for:"うさぎ狩り" },
+  { id:"pomeranian",   api:"pomeranian",        name:"Pomeranian",         nameJa:"ポメラニアン",            origin:"ドイツ",        life_span:"12〜16年", temperament:"Sociable, Extroverted, Lively, Friendly, Playful",         group:"Toy",           weight:"1.9〜3.5",bred_for:"愛玩犬" },
+  { id:"chihuahua",    api:"chihuahua",         name:"Chihuahua",          nameJa:"チワワ",                  origin:"メキシコ",      life_span:"12〜20年", temperament:"Devoted, Lively, Quick, Alert, Courageous",                group:"Toy",           weight:"1.5〜3",  bred_for:"愛玩犬" },
+  { id:"maltese",      api:"maltese",           name:"Maltese",            nameJa:"マルチーズ",              origin:"マルタ島",      life_span:"12〜15年", temperament:"Gentle, Playful, Fearless, Lively, Intelligent, Responsive",group:"Toy",           weight:"1.4〜4",  bred_for:"愛玩犬" },
+  { id:"corgi",        api:"corgi/cardigan",    name:"Corgi",              nameJa:"コーギー",                origin:"ウェールズ",    life_span:"12〜15年", temperament:"Playful, Tenacious, Friendly, Bold, Outgoing, Intelligent", group:"Herding",       weight:"11〜14",  bred_for:"牧牛" },
+  { id:"dachshund",    api:"dachshund",         name:"Dachshund",          nameJa:"ダックスフンド",          origin:"ドイツ",        life_span:"12〜16年", temperament:"Stubborn, Devoted, Lively, Playful, Clever, Courageous",   group:"Hound",         weight:"3〜5",    bred_for:"アナグマ狩り" },
+  { id:"shepherd",     api:"german/shepherd",   name:"German Shepherd",    nameJa:"ジャーマン・シェパード",  origin:"ドイツ",        life_span:"9〜13年",  temperament:"Stubborn, Loyal, Obedient, Alert, Courageous, Intelligent", group:"Herding",       weight:"22〜40",  bred_for:"羊の放牧" },
+  { id:"shihtzu",      api:"shihtzu",           name:"Shih Tzu",           nameJa:"シー・ズー",              origin:"中国",          life_span:"10〜16年", temperament:"Clever, Spunky, Outgoing, Friendly, Lively, Loyal, Gentle", group:"Toy",           weight:"4〜7.2",  bred_for:"愛玩犬" },
+  { id:"yorkshire",    api:"yorkshire",         name:"Yorkshire Terrier",  nameJa:"ヨークシャー・テリア",    origin:"イギリス",      life_span:"13〜16年", temperament:"Bold, Independent, Confident, Courageous, Intelligent",     group:"Toy",           weight:"2〜3.2",  bred_for:"ネズミ狩り" },
+  { id:"dalmatian",    api:"dalmatian",         name:"Dalmatian",          nameJa:"ダルメシアン",            origin:"クロアチア",    life_span:"10〜13年", temperament:"Energetic, Active, Friendly, Outgoing, Intelligent, Playful",group:"Non-Sporting",  weight:"20〜32",  bred_for:"馬車の護衛" },
+  { id:"boxer",        api:"boxer",             name:"Boxer",              nameJa:"ボクサー",                origin:"ドイツ",        life_span:"10〜12年", temperament:"Devoted, Loyal, Friendly, Fearless, Cheerful, Energetic",   group:"Working",       weight:"25〜32",  bred_for:"大型獣の狩猟" },
+  { id:"collie",       api:"collie/border",     name:"Border Collie",      nameJa:"ボーダー・コリー",        origin:"イギリス",      life_span:"10〜17年", temperament:"Tenacious, Keen, Energetic, Responsive, Alert, Intelligent", group:"Herding",       weight:"14〜20",  bred_for:"羊の放牧" },
+  { id:"pug",          api:"pug",               name:"Pug",                nameJa:"パグ",                    origin:"中国",          life_span:"12〜15年", temperament:"Docile, Clever, Sociable, Attentive, Stubborn, Charming",   group:"Toy",           weight:"6〜8",    bred_for:"愛玩犬" },
+  { id:"doberman",     api:"doberman",          name:"Doberman",           nameJa:"ドーベルマン",            origin:"ドイツ",        life_span:"10〜13年", temperament:"Energetic, Alert, Loyal, Intelligent, Fearless, Obedient",  group:"Working",       weight:"32〜45",  bred_for:"護衛・警備" },
+  { id:"rottweiler",   api:"rottweiler",        name:"Rottweiler",         nameJa:"ロットワイラー",          origin:"ドイツ",        life_span:"8〜10年",  temperament:"Steady, Alert, Self-assured, Devoted, Obedient, Fearless",  group:"Working",       weight:"38〜59",  bred_for:"家畜の放牧" },
+  { id:"malamute",     api:"malamute",          name:"Alaskan Malamute",   nameJa:"アラスカン・マラミュート",origin:"アメリカ",      life_span:"10〜14年", temperament:"Affectionate, Friendly, Devoted, Loyal, Dignified, Playful", group:"Working",       weight:"34〜38",  bred_for:"重いそり引き" },
+  { id:"papillon",     api:"papillon",          name:"Papillon",           nameJa:"パピヨン",                origin:"フランス",      life_span:"13〜15年", temperament:"Energetic, Friendly, Alert, Intelligent, Responsive, Happy", group:"Toy",           weight:"3〜4.5",  bred_for:"愛玩犬" },
+  { id:"vizsla",       api:"vizsla",            name:"Vizsla",             nameJa:"ビズラ",                  origin:"ハンガリー",    life_span:"12〜15年", temperament:"Gentle, Energetic, Loyal, Affectionate, Quiet, Agile",      group:"Sporting",      weight:"18〜27",  bred_for:"狩猟" },
+  { id:"weimaraner",   api:"weimaraner",        name:"Weimaraner",         nameJa:"ワイマラナー",            origin:"ドイツ",        life_span:"11〜14年", temperament:"Alert, Energetic, Intelligent, Stubborn, Steady, Powerful",  group:"Sporting",      weight:"25〜40",  bred_for:"狩猟" },
+  { id:"havanese",     api:"havanese",          name:"Havanese",           nameJa:"ハバニーズ",              origin:"キューバ",      life_span:"14〜16年", temperament:"Playful, Companionable, Affectionate, Responsive, Gentle",  group:"Toy",           weight:"3〜6",    bred_for:"愛玩犬" },
+  { id:"newfoundland", api:"newfoundland",      name:"Newfoundland",       nameJa:"ニューファンドランド",    origin:"カナダ",        life_span:"8〜10年",  temperament:"Gentle, Trainable, Sweet-Tempered, Patient, Active",        group:"Working",       weight:"45〜68",  bred_for:"水難救助" },
 ];
+
+// ── 猫品種の日本語名マッピング ──
+const CAT_NAMES_JA = {
+  "Abyssinian":"アビシニアン","Aegean":"エーゲ","American Bobtail":"アメリカン・ボブテイル",
+  "American Curl":"アメリカン・カール","American Shorthair":"アメリカン・ショートヘア",
+  "American Wirehair":"アメリカン・ワイヤーヘア","Balinese":"バリニーズ","Bambino":"バンビーノ",
+  "Bengal":"ベンガル","Birman":"バーマン","Bombay":"ボンベイ",
+  "British Longhair":"ブリティッシュ・ロングヘア","British Shorthair":"ブリティッシュ・ショートヘア",
+  "Burmese":"バーミーズ","Burmilla":"バーミラ","California Spangled":"カリフォルニア・スパングルド",
+  "Chantilly-Tiffany":"シャンティリー","Chartreux":"シャルトリュー","Chausie":"チャウシー",
+  "Cheetoh":"チーター","Colorpoint Shorthair":"カラーポイント・ショートヘア",
+  "Cornish Rex":"コーニッシュ・レックス","Cymric":"シムリック","Cyprus":"キプロス",
+  "Devon Rex":"デボン・レックス","Donskoy":"ドンスコイ","Dragon Li":"ドラゴン・リー",
+  "Dwarf Cat":"ドワーフ・キャット","Egyptian Mau":"エジプシャン・マウ","European Burmese":"ヨーロピアン・バーミーズ",
+  "Exotic Shorthair":"エキゾチック・ショートヘア","Havana Brown":"ハバナ・ブラウン",
+  "Himalayan":"ヒマラヤン","Japanese Bobtail":"ジャパニーズ・ボブテイル","Javanese":"ジャバニーズ",
+  "Khao Manee":"カオマニー","Korat":"コラット","Kurilian Bobtail":"クリリアン・ボブテイル",
+  "LaPerm":"ラパーム","Maine Coon":"メインクーン","Malayan":"マラヤン","Manx":"マンクス",
+  "Munchkin":"マンチカン","Nebelung":"ネベルング","Norwegian Forest Cat":"ノルウェージャン・フォレスト・キャット",
+  "Ocicat":"オシキャット","Oriental":"オリエンタル","Persian":"ペルシャ","Pixie-bob":"ピクシーボブ",
+  "Ragamuffin":"ラガマフィン","Ragdoll":"ラグドール","Russian Blue":"ロシアン・ブルー",
+  "Savannah":"サバンナ","Scottish Fold":"スコティッシュ・フォールド","Selkirk Rex":"セルカークレックス",
+  "Siamese":"シャム","Siberian":"シベリアン","Singapura":"シンガプーラ","Snowshoe":"スノーシュー",
+  "Somali":"ソマリ","Sphynx":"スフィンクス","Tonkinese":"トンキニーズ",
+  "Toyger":"トイガー","Turkish Angora":"トルコアンゴラ","Turkish Van":"ターキッシュ・バン",
+  "York Chocolate":"ヨーク・チョコレート",
+};
 
 // ── 状態管理 ──
 const S = {
@@ -286,11 +313,20 @@ function updateToggle() {
 
 function breeds() { return S.type === 'dog' ? S.dogBreeds : S.catBreeds; }
 
+// 品種の日本語名を取得
+function getNameJa(b) {
+  if (S.type === 'dog') return b.nameJa || b.name;
+  return CAT_NAMES_JA[b.name] || b.name;
+}
+
 function onInput() {
   S.focusIdx = -1;
   const q = document.getElementById('search-input').value.trim().toLowerCase();
   if (!q) { hideDrop(); return; }
-  const matches = breeds().filter(b => b.name.toLowerCase().includes(q)).slice(0, 10);
+  const matches = breeds().filter(b => {
+    const ja = getNameJa(b).toLowerCase();
+    return b.name.toLowerCase().includes(q) || ja.includes(q);
+  }).slice(0, 10);
   renderDrop(matches, q);
 }
 
@@ -299,10 +335,10 @@ function renderDrop(list, q) {
   if (!list.length) { hideDrop(); return; }
   const icon = S.type === 'dog' ? '🐶' : '🐱';
   dd.innerHTML = list.map(b => {
-    const n = b.name, i = n.toLowerCase().indexOf(q);
-    const html = n.slice(0,i) + `<span class="hl">${n.slice(i,i+q.length)}</span>` + n.slice(i+q.length);
+    const ja = getNameJa(b);
+    const en = b.name;
     const idx = breeds().indexOf(b);
-    return `<div class="dd-item" onclick="selectBreed(${idx})">${icon} ${html}</div>`;
+    return `<div class="dd-item" onclick="selectBreed(${idx})">${icon} <span><b>${ja}</b> <span style="font-size:0.78rem;opacity:0.6">${en}</span></span></div>`;
   }).join('');
   dd.classList.remove('hidden');
 }
@@ -356,14 +392,37 @@ async function randomBreed() {
   await selectBreed(Math.floor(Math.random() * list.length));
 }
 
+// 性格の日本語訳
+const TEMP_JA = {
+  "Alert":"警戒心が強い","Active":"活発","Attentive":"注意深い","Faithful":"忠実",
+  "Docile":"おとなしい","Courageous":"勇敢","Dignified":"威厳がある","Loyal":"忠誠心が高い",
+  "Receptive":"物わかりが良い","Friendly":"フレンドリー","Outgoing":"社交的",
+  "Gentle":"おだやか","Intelligent":"かしこい","Lively":"元気いっぱい","Stubborn":"頑固",
+  "Sociable":"人懐っこい","Playful":"遊び好き","Reliable":"頼もしい","Trustworthy":"信頼できる",
+  "Kind":"やさしい","Confident":"自信家","Determined":"粘り強い","Excitable":"感情豊か",
+  "Amiable":"愛想がいい","Extroverted":"外向的","Devoted":"一途","Quick":"素早い",
+  "Willful":"意志が強い","Gregarious":"群れが好き","Easygoing":"のんびり屋",
+  "Patient":"忍耐強い","Affectionate":"甘えん坊","Tenacious":"粘り強い","Bold":"大胆",
+  "Clever":"頭がいい","Energetic":"エネルギッシュ","Fearless":"怖いもの知らず",
+  "Cheerful":"明るい","Keen":"鋭敏","Responsive":"反応が早い","Trainable":"覚えが早い",
+  "Spunky":"元気はつらつ","Charming":"魅力的","Obedient":"素直","Steady":"落ち着いている",
+  "Companionable":"人が大好き","Happy":"幸せそう",
+};
+
+function translateTemp(t) {
+  return TEMP_JA[t.trim()] || t.trim();
+}
+
 function makeStarters(breed, type) {
   const pool = [];
+  const nameJa = getNameJa(breed);
   if (breed.temperament) {
     const pick = breed.temperament.split(',').map(s=>s.trim()).filter(Boolean)
       .sort(()=>Math.random()-0.5).slice(0,3);
-    pool.push(`💬 「${pick.join(' · ')}」な性格らしいよ！あなたのイメージと合ってる？`);
+    const jaList = pick.map(translateTemp);
+    pool.push(`💬 「${jaList.join('・')}」な性格らしいよ！あなたのイメージと合ってる？`);
   }
-  if (breed.origin) pool.push(`🌍 ${breed.name}は${breed.origin}出身なんだって！意外じゃない？`);
+  if (breed.origin) pool.push(`🌍 ${nameJa}って${breed.origin}出身なんだって！意外じゃない？`);
   if (breed.life_span) pool.push(`⏳ 平均寿命は${breed.life_span}。長い付き合いになりそうだよね！`);
   if (type === 'dog') {
     if (breed.bred_for) pool.push(`🎯 もともと「${breed.bred_for}」のために育てられたって知ってた？`);
@@ -381,7 +440,7 @@ function makeStarters(breed, type) {
     if (breed.energy_level>=4) t.push('活発');
     if (breed.child_friendly>=4) t.push('子供にやさしい');
     if (breed.shedding_level<=2) t.push('抜け毛少なめ');
-    if (t.length) pool.push(`✨ ${t.slice(0,3).join(' · ')}なニャンコだよ！`);
+    if (t.length) pool.push(`✨ ${t.slice(0,3).join('・')}なニャンコだよ！`);
     if (breed.weight?.metric) pool.push(`⚖️ 体重は${breed.weight.metric}kg。抱っこしやすいサイズかも！`);
   }
   return pool.sort(()=>Math.random()-0.5).slice(0,4);
@@ -392,7 +451,7 @@ function toggleFav(){
   const{breed,type,image}=S;
   const idx=S.favorites.findIndex(f=>f.id===breed.id&&f.type===type);
   if(idx>=0)S.favorites.splice(idx,1);
-  else S.favorites.push({id:breed.id,name:breed.name,type,image,origin:breed.origin||''});
+  else S.favorites.push({id:breed.id,name:breed.name,nameJa:getNameJa(breed),type,image,origin:breed.origin||''});
   localStorage.setItem('fwmt',JSON.stringify(S.favorites));
   updateFavCount();
   const btn=document.getElementById('fav-btn');
@@ -415,7 +474,7 @@ function renderFavList(){
   el.innerHTML=S.favorites.map((f,i)=>`
     <div class="fav-item">
       ${f.image?`<img class="fav-thumb" src="${f.image}" alt="${f.name}">`:`<div class="fav-thumb-ph">${f.type==='dog'?'🐶':'🐱'}</div>`}
-      <div><div class="fav-name">${f.name}</div><div class="fav-meta">${f.type==='dog'?'🐶 いぬ':'🐱 ねこ'}${f.origin?' · '+f.origin:''}</div></div>
+      <div><div class="fav-name">${f.nameJa||f.name}</div><div class="fav-meta">${f.type==='dog'?'🐶 いぬ':'🐱 ねこ'}${f.origin?' · '+f.origin:''}</div></div>
       <button class="fav-rm" onclick="removeFav(${i})">✕</button>
     </div>`).join('');
 }
@@ -444,8 +503,8 @@ function render(){
         <div class="corner tl">${animal}</div>
         ${tags.length?`<div class="tags-overlay">${tags.map(t=>`<span class="tag-pill">${t}</span>`).join('')}</div>`:''}
         <div class="name-overlay">
-          <div class="breed-name">${breed.name}</div>
-          ${breed.origin?`<div class="breed-sub">📍 ${breed.origin}</div>`:''}
+          <div class="breed-name">${getNameJa(breed)}</div>
+          <div class="breed-sub">${breed.name}${breed.origin ? ' ／ 📍 ' + breed.origin : ''}</div>
         </div>
         <button class="fav-btn" id="fav-btn" onclick="toggleFav()">${isFaved(breed.id,type)?'❤️':'🤍'}</button>
       </div>
