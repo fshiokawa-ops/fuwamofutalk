@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ふわもふトーク 🐾</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, 'メイリオ', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(160deg, #fff8f0 0%, #fff4fb 55%, #f4f0ff 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 16px 48px;
+    }
+
+    /* ─── Header ─── */
+    .header { text-align: center; margin-bottom: 22px; }
+
+    .title {
+      font-size: 2rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ff6b6b 0%, #c850f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle { font-size: 0.88rem; color: #bbb; margin-top: 5px; }
+
+    /* ─── Toggle ─── */
+    .toggle-wrap {
+      display: flex;
+      background: white;
+      border-radius: 50px;
+      padding: 5px;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.09);
+      margin-bottom: 22px;
+      gap: 4px;
+    }
+
+    .toggle-btn {
+      padding: 10px 32px;
+      border: none;
+      border-radius: 50px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 700;
+      transition: all 0.25s ease;
+      background: transparent;
+      color: #ccc;
+    }
+
+    .toggle-btn.active-dog {
+      background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+      color: white;
+      box-shadow: 0 4px 14px rgba(255,107,107,0.38);
+    }
+
+    .toggle-btn.active-cat {
+      background: linear-gradient(135deg, #a855f7, #7c6efa);
+      color: white;
+      box-shadow: 0 4px 14px rgba(168,85,247,0.38);
+    }
+
+    /* ─── Card ─── */
+    .card {
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 14px 44px rgba(0,0,0,0.09);
+      max-width: 450px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* ─── Image ─── */
+    .image-wrap {
+      position: relative;
+      width: 100%;
+      height: 310px;
+      background: #f2f2f2;
+      overflow: hidden;
+    }
+
+    .breed-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: opacity 0.5s;
+    }
+
+    .img-placeholder {
+      width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5.5rem;
+      background: linear-gradient(135deg, #f7f7f7, #ececec);
+    }
+
+    /* ─── Fav button ─── */
+    .fav-btn {
+      position: absolute;
+      top: 14px; right: 14px;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(6px);
+      font-size: 1.35rem;
+      cursor: pointer;
+      transition: transform 0.18s;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .fav-btn:hover { transform: scale(1.12); }
+    .fav-btn:active { transform: scale(0.9); }
+
+    /* ─── Info ─── */
+    .info-section { padding: 20px 22px 16px; }
+
+    .name-row {
+      display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px;
+    }
+
+    .breed-name { font-size: 1.65rem; font-weight: 900; color: #222; }
+
+    .breed-origin { font-size: 0.85rem; color: #bbb; }
+
+    .tags {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px;
+    }
+
+    .tag {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      background: #f5f5f5;
+      color: #777;
+    }
+
+    /* ─── Conversation starters ─── */
+    .starters-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #ccc;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 11px;
+    }
+
+    .starters { display: flex; flex-direction: column; gap: 9px; }
+
+    .starter {
+      padding: 13px 15px;
+      border-radius: 14px;
+      background: #fafafa;
+      font-size: 0.91rem;
+      line-height: 1.65;
+      color: #333;
+      border-left: 3px solid;
+      opacity: 0;
+      transform: translateX(-8px);
+      animation: appear 0.4s ease forwards;
+    }
+
+    .starter:nth-child(1) { animation-delay: 0.06s; }
+    .starter:nth-child(2) { animation-delay: 0.17s; }
+    .starter:nth-child(3) { animation-delay: 0.28s; }
+    .starter:nth-child(4) { animation-delay: 0.39s; }
+
+    @keyframes appear {
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .type-dog .starter { border-left-color: #ff8e53; }
+    .type-cat .starter { border-left-color: #a855f7; }
+
+    /* ─── Next button ─── */
+    .btn-wrap { padding: 16px 22px 22px; }
+
+    .next-btn {
+      width: 100%; padding: 15px;
+      border: none; border-radius: 50px;
+      font-size: 1.05rem; font-weight: 800;
+      cursor: pointer; font-family: inherit;
+      transition: transform 0.15s, box-shadow 0.15s;
+      letter-spacing: 0.02em;
+    }
+
+    .next-btn:hover { transform: translateY(-2px); }
+    .next-btn:active { transform: scale(0.97); }
+
+    .type-dog .next-btn {
+      background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+      color: white;
+      box-shadow: 0 7px 22px rgba(255,107,107,0.38);
+    }
+
+    .type-cat .next-btn {
+      background: linear-gradient(135deg, #a855f7, #7c6efa);
+      color: white;
+      box-shadow: 0 7px 22px rgba(168,85,247,0.38);
+    }
+
+    /* ─── Loading ─── */
+    .loading-card {
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 14px 44px rgba(0,0,0,0.09);
+      max-width: 450px; width: 100%;
+      padding: 80px 24px;
+      text-align: center;
+    }
+
+    .loading-emoji { font-size: 3.5rem; display: inline-block; animation: spin 1.2s linear infinite; }
+    .loading-text { font-size: 0.95rem; color: #bbb; margin-top: 14px; }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* ─── Fav counter ─── */
+    .fav-counter {
+      margin-top: 18px;
+      font-size: 0.85rem;
+      color: #ccc;
+      cursor: pointer;
+      transition: color 0.2s;
+      user-select: none;
+    }
+    .fav-counter:hover { color: #888; }
+
+    /* ─── Modal ─── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.38);
+      backdrop-filter: blur(5px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; padding: 24px;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 26px;
+      max-width: 450px; width: 100%;
+      max-height: 82vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    }
+
+    .modal-head {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .modal-title { font-size: 1.35rem; font-weight: 900; color: #222; }
+
+    .modal-close {
+      border: none; background: #f2f2f2;
+      width: 34px; height: 34px;
+      border-radius: 50%; cursor: pointer;
+      font-size: 1rem; color: #888;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-close:hover { background: #e8e8e8; }
+
+    .fav-item {
+      display: flex; gap: 13px; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid #f5f5f5;
+    }
+
+    .fav-thumb {
+      width: 58px; height: 58px;
+      border-radius: 14px; object-fit: cover;
+      background: #f5f5f5; flex-shrink: 0;
+    }
+
+    .fav-thumb-ph {
+      width: 58px; height: 58px;
+      border-radius: 14px; background: #f5f5f5;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; flex-shrink: 0;
+    }
+
+    .fav-name { font-weight: 800; font-size: 0.98rem; color: #222; }
+    .fav-meta { font-size: 0.78rem; color: #bbb; margin-top: 2px; }
+
+    .fav-rm {
+      margin-left: auto;
+      border: none; background: none;
+      cursor: pointer; font-size: 1.1rem; color: #ddd;
+      transition: color 0.2s; flex-shrink: 0;
+    }
+    .fav-rm:hover { color: #ff6b6b; }
+
+    .empty-fav {
+      text-align: center; padding: 40px 0;
+      color: #bbb; font-size: 0.95rem; line-height: 1.8;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1 class="title">🐾 ふわもふトーク</h1>
+  <p class="subtitle">犬猫の話題で会話がはずむ！</p>
+</div>
+
+<div class="toggle-wrap">
+  <button class="toggle-btn" id="btn-dog" onclick="setType('dog')">🐶 犬</button>
+  <button class="toggle-btn" id="btn-cat" onclick="setType('cat')">🐱 猫</button>
+</div>
+
+<div id="main"></div>
+
+<div class="fav-counter" onclick="openFav()">♡ お気に入り <span id="fav-count">0</span> 頭</div>
+
+<!-- Favorites modal -->
+<div class="overlay hidden" id="overlay" onclick="overlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <span class="modal-title">💕 お気に入り</span>
+      <button class="modal-close" onclick="closeFav()">✕</button>
+    </div>
+    <div id="fav-list"></div>
+  </div>
+</div>
+
+<script>
+  /* ──────────── State ──────────── */
+  const state = {
+    type: 'dog',
+    dogBreeds: [],
+    catBreeds: [],
+    breed: null,
+    image: null,
+    favorites: JSON.parse(localStorage.getItem('fwmt') || '[]'),
+  };
+
+  /* ──────────── Init ──────────── */
+  async function init() {
+    updateToggle();
+    renderLoading();
+    const [dogs, cats] = await Promise.all([
+      fetch('https://api.thedogapi.com/v1/breeds').then(r => r.json()).catch(() => []),
+      fetch('https://api.thecatapi.com/v1/breeds').then(r => r.json()).catch(() => []),
+    ]);
+    state.dogBreeds = Array.isArray(dogs) ? dogs : [];
+    state.catBreeds = Array.isArray(cats) ? cats : [];
+    updateFavCount();
+    await nextBreed();
+  }
+
+  /* ──────────── Type toggle ──────────── */
+  function setType(t) {
+    state.type = t;
+    updateToggle();
+    nextBreed();
+  }
+
+  function updateToggle() {
+    document.getElementById('btn-dog').className =
+      'toggle-btn' + (state.type === 'dog' ? ' active-dog' : '');
+    document.getElementById('btn-cat').className =
+      'toggle-btn' + (state.type === 'cat' ? ' active-cat' : '');
+  }
+
+  /* ──────────── Fetch next breed ──────────── */
+  async function nextBreed() {
+    renderLoading();
+    const breeds = state.type === 'dog' ? state.dogBreeds : state.catBreeds;
+    if (!breeds.length) { renderError(); return; }
+
+    state.breed = breeds[Math.floor(Math.random() * breeds.length)];
+
+    const base = state.type === 'dog'
+      ? 'https://api.thedogapi.com/v1/images/search'
+      : 'https://api.thecatapi.com/v1/images/search';
+
+    try {
+      const res = await fetch(`${base}?breed_ids=${state.breed.id}&limit=8`);
+      const data = await res.json();
+      const imgs = data.filter(d => d.url);
+      state.image = imgs.length ? imgs[Math.floor(Math.random() * imgs.length)].url : null;
+    } catch { state.image = null; }
+
+    render();
+  }
+
+  /* ──────────── Conversation starters ──────────── */
+  function makeStarters(breed, type) {
+    const pool = [];
+    const name = breed.name;
+
+    if (breed.temperament) {
+      const traits = breed.temperament.split(',').map(s => s.trim()).filter(Boolean);
+      const pick = traits.sort(() => Math.random() - 0.5).slice(0, 3);
+      pool.push(`💬 「${pick.join('・')}」な${type === 'dog' ? 'ワンちゃん' : 'ニャンコ'}らしいけど、想像できる？`);
+    }
+
+    if (breed.origin) {
+      pool.push(`🌍 ${name}って${breed.origin}出身なんだって！遠いところから来たんだね〜`);
+    }
+
+    if (breed.life_span) {
+      pool.push(`⏳ 平均寿命は${breed.life_span}。長い縁になりそうだよね！`);
+    }
+
+    if (type === 'dog') {
+      if (breed.bred_for) {
+        pool.push(`🎯 もともと「${breed.bred_for}」のために育てられたって知ってた？`);
+      }
+      if (breed.breed_group) {
+        pool.push(`📋 ${breed.breed_group}グループのワンちゃんだよ。犬の世界にも派閥があるんだね！`);
+      }
+      if (breed.weight?.metric) {
+        pool.push(`⚖️ 大人になると体重${breed.weight.metric}kgになるんだって。ひょいっと抱っこできるかな？`);
+      }
+      if (breed.height?.metric) {
+        pool.push(`📏 身長（体高）は${breed.height.metric}cmくらい。大きさイメージできる？`);
+      }
+    }
+
+    if (type === 'cat') {
+      if (breed.description) {
+        const first = breed.description.split(/\.\s+/)[0].trim();
+        if (first.length < 90) pool.push(`📖 ${first}.`);
+      }
+      const traits = [];
+      if (breed.affection_level >= 4) traits.push('甘えん坊');
+      if (breed.intelligence >= 4) traits.push('かしこい');
+      if (breed.energy_level >= 4) traits.push('活発');
+      if (breed.child_friendly >= 4) traits.push('子供にもやさしい');
+      if (breed.dog_friendly >= 4) traits.push('犬とも仲良し');
+      if (breed.vocalisation >= 4) traits.push('おしゃべり上手');
+      if (breed.shedding_level <= 2) traits.push('抜け毛少なめ');
+      if (breed.grooming <= 2) traits.push('お手入れかんたん');
+      if (traits.length) {
+        pool.push(`⭐ ${traits.slice(0, 3).join('・')}なニャンコだよ！飼ってみたくない？`);
+      }
+      if (breed.weight?.metric) {
+        pool.push(`⚖️ 体重は${breed.weight.metric}kg。ちょうど抱っこしやすいサイズかも！`);
+      }
+    }
+
+    return pool.sort(() => Math.random() - 0.5).slice(0, 4);
+  }
+
+  /* ──────────── Favorites ──────────── */
+  function isFaved(id, type) {
+    return state.favorites.some(f => f.id === id && f.type === type);
+  }
+
+  function toggleFav() {
+    const { breed, type, image } = state;
+    const idx = state.favorites.findIndex(f => f.id === breed.id && f.type === type);
+    if (idx >= 0) {
+      state.favorites.splice(idx, 1);
+    } else {
+      state.favorites.push({
+        id: breed.id,
+        name: breed.name,
+        type,
+        image,
+        origin: breed.origin || '',
+      });
+    }
+    localStorage.setItem('fwmt', JSON.stringify(state.favorites));
+    updateFavCount();
+    const btn = document.getElementById('fav-btn');
+    if (btn) btn.textContent = isFaved(breed.id, type) ? '❤️' : '🤍';
+  }
+
+  function updateFavCount() {
+    document.getElementById('fav-count').textContent = state.favorites.length;
+  }
+
+  function openFav() {
+    document.getElementById('overlay').classList.remove('hidden');
+    renderFavList();
+  }
+
+  function closeFav() {
+    document.getElementById('overlay').classList.add('hidden');
+  }
+
+  function overlayClick(e) {
+    if (e.target === document.getElementById('overlay')) closeFav();
+  }
+
+  function removeFav(idx) {
+    state.favorites.splice(idx, 1);
+    localStorage.setItem('fwmt', JSON.stringify(state.favorites));
+    updateFavCount();
+    renderFavList();
+  }
+
+  function renderFavList() {
+    const el = document.getElementById('fav-list');
+    if (!state.favorites.length) {
+      el.innerHTML = `<div class="empty-fav">まだお気に入りはいないよ！<br>気になった子に ❤️ を押してね</div>`;
+      return;
+    }
+    el.innerHTML = state.favorites.map((f, i) => `
+      <div class="fav-item">
+        ${f.image
+          ? `<img class="fav-thumb" src="${f.image}" alt="${f.name}">`
+          : `<div class="fav-thumb-ph">${f.type === 'dog' ? '🐶' : '🐱'}</div>`}
+        <div>
+          <div class="fav-name">${f.name}</div>
+          <div class="fav-meta">${f.type === 'dog' ? '犬' : '猫'}${f.origin ? ' · ' + f.origin : ''}</div>
+        </div>
+        <button class="fav-rm" onclick="removeFav(${i})">✕</button>
+      </div>
+    `).join('');
+  }
+
+  /* ──────────── Render ──────────── */
+  function renderLoading() {
+    const em = state.type === 'dog' ? '🐶' : '🐱';
+    document.getElementById('main').innerHTML = `
+      <div class="loading-card">
+        <div class="loading-emoji">${em}</div>
+        <div class="loading-text">読み込み中…</div>
+      </div>`;
+  }
+
+  function renderError() {
+    document.getElementById('main').innerHTML = `
+      <div class="loading-card">
+        <div style="font-size:3rem">😿</div>
+        <div class="loading-text">データを取得できませんでした</div>
+      </div>`;
+  }
+
+  function render() {
+    const { breed, type, image } = state;
+    const faved = isFaved(breed.id, type);
+    const starters = makeStarters(breed, type);
+    const animal = type === 'dog' ? '🐶' : '🐱';
+
+    const tags = [];
+    if (breed.life_span) tags.push(`⏳ ${breed.life_span}`);
+    if (breed.weight?.metric) tags.push(`⚖️ ${breed.weight.metric}kg`);
+    if (type === 'dog' && breed.breed_group) tags.push(`📋 ${breed.breed_group}`);
+    if (type === 'cat' && breed.indoor === 1) tags.push('🏠 室内向き');
+
+    document.getElementById('main').innerHTML = `
+      <div class="card type-${type}">
+        <div class="image-wrap">
+          ${image ? `<img class="breed-img" src="${image}" alt="${breed.name}"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
+          <div class="img-placeholder" style="${image ? 'display:none' : ''}">${animal}</div>
+          <button class="fav-btn" id="fav-btn" onclick="toggleFav()">${faved ? '❤️' : '🤍'}</button>
+        </div>
+
+        <div class="info-section">
+          <div class="name-row">
+            <span class="breed-name">${breed.name}</span>
+            ${breed.origin ? `<span class="breed-origin">📍 ${breed.origin}</span>` : ''}
+          </div>
+
+          ${tags.length ? `<div class="tags">${tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
+
+          <div class="starters-label">💭 会話のきっかけ</div>
+          <div class="starters">
+            ${starters.map(s => `<div class="starter">${s}</div>`).join('')}
+          </div>
+        </div>
+
+        <div class="btn-wrap">
+          <button class="next-btn" onclick="nextBreed()">次の子に会う ➜</button>
+        </div>
+      </div>`;
+  }
+
+  init();
+</script>
+</body>
+</html>
